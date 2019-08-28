@@ -42,9 +42,9 @@ if __name__ == '__main__':
         "accounts": {
             "heap": "7f9nY9R4LYwmTuc3oEVhDETx6pq5uMpxYzS7nX4F5jNVn6MTcF1"
         },
-        "key_password": "123456",
-        "api_token": "3cYdoIdwr3b49eyuH92oPw==",
-        "uri": "ws://127.0.0.1:3155",
+        "master_key": "123456",
+        "api_key": "3cYdoIdwr3b49eyuH92oPw==",
+        "uri": "ws://127.0.0.1:3145",
     }
 
     nodes = load_nodes("sample.json")
