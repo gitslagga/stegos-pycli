@@ -15,8 +15,8 @@ async def client_from_node(node):
     client = stegos.StegosClient(node_id=node['node_id'],
                                  uri=node['uri'],
                                  accounts=node['accounts'],
-                                 master_key=node['key_password'],
-                                 api_key=node['api_token'])
+                                 master_key=node['master_key'],
+                                 api_key=node['api_key'])
 
     await client.connect()
     return client
