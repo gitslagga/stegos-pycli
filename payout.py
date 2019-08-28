@@ -4,13 +4,6 @@ import asyncio
 import json
 import stegos
 
-
-def load_nodes(path):
-    f = open(path, "r")
-    encoded = f.read()
-    return json.loads(encoded)
-
-
 async def client_from_node(node):
     client = stegos.StegosClient(node_id=node['node_id'],
                                  uri=node['uri'],
@@ -22,19 +15,19 @@ async def client_from_node(node):
     return client
 
 
-async def my_app(heap_node, nodes):
+async def my_app(heap_node, toAddress):
     node01 = await client_from_node(heap_node)
 
-    my_account = list(heap['accounts'].keys())[0]
+    my_account = list(heap_node['accounts'].keys())[0]
     print("Waiting for sync!")
     await node01.wait_sync()
     balance = await node01.get_balance(my_account)
+    
     print(f"Node01 balance before payments: {balance}")
-    for n in nodes:
-        for id in n['accounts'].keys():
-            print(f"send: {my_account}")
-            print(f"receive: {n['accounts'][id]}")
-            await node01.payment_with_confirmation(my_account, n['accounts'][id], 100_000, comment="Initial payout")
+    print(f"send: {heap_node['accounts'][my_account]}")
+    print(f"receive: {toAddress}")
+
+    await node01.payment_with_confirmation(my_account, toAddress, 100_000, comment="Initial payout")
 
     print(f"Node01 balance after payments: {balance}")
 
@@ -49,6 +42,5 @@ if __name__ == '__main__':
         "uri": "ws://127.0.0.1:3145",
     }
 
-    nodes = load_nodes("sample.json")
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(my_app(heap, nodes))
+    loop.run_until_complete(my_app(heap, "7fd3kYCiBWSGg5bn7dC5EMWHLS8Ndsw8C2VFsHnzDcKmWmQ8jj6"))
