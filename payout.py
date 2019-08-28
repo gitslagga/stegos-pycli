@@ -3,6 +3,8 @@
 import asyncio
 import json
 import stegos
+import logging
+
 
 async def client_from_node(node):
     client = stegos.StegosClient(node_id=node['node_id'],
@@ -22,13 +24,14 @@ async def my_app(heap_node, toAddress):
     print("Waiting for sync!")
     await node01.wait_sync()
     balance = await node01.get_balance(my_account)
-    
+
     print(f"Node01 balance before payments: {balance}")
     print(f"send: {heap_node['accounts'][my_account]}")
     print(f"receive: {toAddress}")
 
-    await node01.payment_with_confirmation(my_account, toAddress, 100_000, comment="Initial payout")
+    await node01.payment_with_confirmation(my_account, toAddress, 1_000, comment="Hi from Stegos")
 
+    balance = await node01.get_balance('heap')
     print(f"Node01 balance after payments: {balance}")
 
 if __name__ == '__main__':
@@ -41,6 +44,10 @@ if __name__ == '__main__':
         "api_key": "3cYdoIdwr3b49eyuH92oPw==",
         "uri": "ws://127.0.0.1:3145",
     }
+    
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        level=logging.INFO)
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(my_app(heap, "7fd3kYCiBWSGg5bn7dC5EMWHLS8Ndsw8C2VFsHnzDcKmWmQ8jj6"))
+    loop.run_until_complete(
+        my_app(heap, "7fd3kYCiBWSGg5bn7dC5EMWHLS8Ndsw8C2VFsHnzDcKmWmQ8jj6"))
