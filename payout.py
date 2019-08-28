@@ -28,10 +28,12 @@ async def my_app(heap_node, nodes):
     my_account = list(heap['accounts'].keys())[0]
     print("Waiting for sync!")
     await node01.wait_sync()
-    balance = await node01.get_balance('heap')
+    balance = await node01.get_balance(my_account)
     print(f"Node01 balance before payments: {balance}")
     for n in nodes:
         for id in n['accounts'].keys():
+            print(f"send: {my_account}")
+            print(f"receive: {n['accounts'][id]}")
             await node01.payment_with_confirmation(my_account, n['accounts'][id], 100_000, comment="Initial payout")
 
     print(f"Node01 balance after payments: {balance}")
@@ -40,7 +42,7 @@ if __name__ == '__main__':
     heap = {
         "node_id": "heap",
         "accounts": {
-            "heap": "7f9nY9R4LYwmTuc3oEVhDETx6pq5uMpxYzS7nX4F5jNVn6MTcF1"
+            "1": "7f9nY9R4LYwmTuc3oEVhDETx6pq5uMpxYzS7nX4F5jNVn6MTcF1"
         },
         "master_key": "123456",
         "api_key": "3cYdoIdwr3b49eyuH92oPw==",
