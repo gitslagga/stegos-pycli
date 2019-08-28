@@ -11,7 +11,7 @@ async def my_app():
                                      '1': '7fCTXenNEh14D4y2ciiaQm4oGDbw7HcbzhUad8dHkrfLuFitR5D'
                                  },
                                  master_key='dev01',
-                                 api_key='YvjaSV59G9jseRh7+dDEBA==')
+                                 api_key='3cYdoIdwr3b49eyuH92oPw==')
 
     await node01.connect()
 
