@@ -1,6 +1,7 @@
 from flask import Flask, abort, request, jsonify
 from flask.json import JSONEncoder as BaseJSONEncoder
 from gevent.pywsgi import WSGIServer
+from logging.handlers import RotatingFileHandler
 
 import logging
 import json
@@ -35,7 +36,7 @@ loop.run_until_complete(rpc_connection.wait_sync())
 ###################################### rustful api ################################################
 @app.route('/getinfo', methods=['POST'])
 async def getinfo():
-    wallet_info = rpc_connection.getinfo()
+    wallet_info = await rpc_connection.get_balance()
     return jsonify({'code': 0, 'data': wallet_info})
 
 @app.route('/getblockcount', methods=['POST'])
@@ -166,12 +167,13 @@ class JSONEncoder(BaseJSONEncoder):
 app.json_encoder = JSONEncoder
 
 if __name__ == '__main__':
-    handler = logging.FileHandler('flask.log', encoding='UTF-8')
-    handler.setLevel(logging.WARNING)
-    logging_format = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')
-    handler.setFormatter(logging_format)
-    app.logger.addHandler(handler)
-    
+    logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+    handler = RotatingFileHandler('flask.log', maxBytes=100*1024*1024, backupCount=5)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logging.getLogger('').addHandler(handler)
+    logging.getLogger('websockets').addHandler(logging.NullHandler())
+    logging.getLogger('websockets').setLevel(logging.CRITICAL)
     # app.run(debug=True)
 
     ###################################### production run ################################################

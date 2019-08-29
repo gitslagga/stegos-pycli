@@ -39,3 +39,12 @@ On the first cluster run, nodes will create `api_token.txt` file with encryption
 * create_accounts.py - create additional accounts on the nodes
 * simplecannon.py - Generate regular payments betweeen nodes in round-robin fashion
 * megacannon.py - Generate Snowball payments betweeen nodes in round-robin fashion
+
+## Install
+* sudo apt install python3-widgetsnbextension
+* sudo apt install python3-testresources
+* sudo pip3.7 install wheel
+* sudo pip3.7 install bdist_wheel_name
+* sudo pip3.7 install flask
+* sudo pip3.7 install requests
+* sudo pip3.7 install gevent
