@@ -30,24 +30,24 @@ async def client_from_node():
     return client
 
 loop = asyncio.get_event_loop()
-rpc_connection = loop.run_until_complete(client_from_node())
-loop.run_until_complete(rpc_connection.wait_sync())
+websocket_client = loop.run_until_complete(client_from_node())
+loop.run_until_complete(websocket_client.wait_sync())
 
 ###################################### rustful api ################################################
 @app.route('/getinfo', methods=['POST'])
-async def getinfo():
-    wallet_info = await rpc_connection.get_balance()
+def getinfo():
+    wallet_info = loop.run_until_complete(websocket_client.get_balance("1"))
     return jsonify({'code': 0, 'data': wallet_info})
 
 @app.route('/getblockcount', methods=['POST'])
 def getblockcount():
-    block_count = rpc_connection.getblockcount()
+    block_count = websocket_client.getblockcount()
     return jsonify({'code': 0, 'data': block_count})
 
 @app.route('/getnewaddress', methods=['POST'])
 def getnewaddress():
-    address = rpc_connection.getnewaddress()
-    privateKey = rpc_connection.dumpprivkey(address)
+    address = websocket_client.getnewaddress()
+    privateKey = websocket_client.dumpprivkey(address)
 
     return jsonify({'code': 0, 'data': {
         "address": address,
@@ -56,7 +56,7 @@ def getnewaddress():
 
 @app.route('/getbalance', methods=['POST'])
 def getbalance():
-    balance = rpc_connection.getbalance()
+    balance = websocket_client.getbalance()
     return jsonify({'code': 0, 'data': balance})
 
 @app.route('/sendtoaddress', methods=['POST'])
@@ -67,7 +67,7 @@ def sendtoaddress():
         abort(400)
     else:
         try:
-            hash = rpc_connection.sendtoaddress(request.json['address'], request.json['amount'])
+            hash = websocket_client.sendtoaddress(request.json['address'], request.json['amount'])
         except Exception as ex:
             app.logger.warning('Sendtoaddress exception: {}'.format(ex))
             sendDingDing('Sendtoaddress exception: {}, request json: {}'.format(ex, request.json))
@@ -85,7 +85,7 @@ def listtransactions():
         num = request.json['num']
 
     try:
-        list_transactions = rpc_connection.listtransactions('*', num, start)
+        list_transactions = websocket_client.listtransactions('*', num, start)
     except Exception as ex:
         app.logger.warning('listtransactions exception: {}'.format(ex))
         return jsonify({'code': 500})
@@ -93,7 +93,7 @@ def listtransactions():
 
 @app.route('/listaddressgroupings', methods=['POST'])
 def listaddressgroupings():
-    address_groupings = rpc_connection.listaddressgroupings()
+    address_groupings = websocket_client.listaddressgroupings()
     return jsonify({'code': 0, 'data': address_groupings})
 
 @app.route('/getblock', methods=['POST'])
@@ -104,7 +104,7 @@ def getblock():
         abort(400)
     else:
         try:
-            block = rpc_connection.getblock(request.json['hashorheight'])
+            block = websocket_client.getblock(request.json['hashorheight'])
         except Exception as ex:
             app.logger.warning('getblock exception: {}'.format(ex))
             return jsonify({'code': 500})
@@ -118,7 +118,7 @@ def gettransaction():
         abort(400)
     else:
         try:
-            transaction = rpc_connection.gettransaction(request.json['txid'])
+            transaction = websocket_client.gettransaction(request.json['txid'])
         except Exception as ex:
             app.logger.warning('gettransaction exception: {}'.format(ex))
             return jsonify({'code': 500})
