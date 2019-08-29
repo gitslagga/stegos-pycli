@@ -41,38 +41,34 @@ def getinfo():
 
 @app.route('/getblockcount', methods=['POST'])
 def getblockcount():
-    block_count = websocket_client.getblockcount()
+    block_count = loop.run_until_complete(websocket_client.election_info())
     return jsonify({'code': 0, 'data': block_count})
 
 @app.route('/getnewaddress', methods=['POST'])
 def getnewaddress():
-    address = websocket_client.getnewaddress()
-    privateKey = websocket_client.dumpprivkey(address)
-
-    return jsonify({'code': 0, 'data': {
-        "address": address,
-        "privateKey": privateKey
-    }})
+    account = loop.run_until_complete(websocket_client.create_account())
+    return jsonify({'code': 0, 'data': account})
 
 @app.route('/getbalance', methods=['POST'])
 def getbalance():
-    balance = websocket_client.getbalance()
-    return jsonify({'code': 0, 'data': balance})
+    balance_info = loop.run_until_complete(websocket_client.get_balance("1"))
+    return jsonify({'code': 0, 'data': balance_info})
 
 @app.route('/sendtoaddress', methods=['POST'])
 def sendtoaddress():
     app.logger.warning('request params: {}'.format(request.json))
 
-    if not request.json or 'address' not in request.json or 'amount' not in request.json:
+    if not request.json or 'accountid' not in request.json or 'address' not in request.json or 'amount' not in request.json:
         abort(400)
     else:
         try:
-            hash = websocket_client.sendtoaddress(request.json['address'], request.json['amount'])
+            txdata = loop.run_until_complete(websocket_client.payment_with_confirmation(
+                request.json['accountid'], request.json['address'], request.json['amount'], 'Hi from Stegos'))
         except Exception as ex:
             app.logger.warning('Sendtoaddress exception: {}'.format(ex))
             sendDingDing('Sendtoaddress exception: {}, request json: {}'.format(ex, request.json))
             return jsonify({'code': 500})
-        return jsonify({'code': 0, 'data': hash})
+        return jsonify({'code': 0, 'data': txdata})
 
 @app.route('/listtransactions', methods=['POST'])
 def listtransactions():
@@ -90,25 +86,6 @@ def listtransactions():
         app.logger.warning('listtransactions exception: {}'.format(ex))
         return jsonify({'code': 500})
     return jsonify({'code': 0, 'data': list_transactions})
-
-@app.route('/listaddressgroupings', methods=['POST'])
-def listaddressgroupings():
-    address_groupings = websocket_client.listaddressgroupings()
-    return jsonify({'code': 0, 'data': address_groupings})
-
-@app.route('/getblock', methods=['POST'])
-def getblock():
-    app.logger.warning('request params: {}'.format(request.json))
-
-    if not request.json or 'hashorheight' not in request.json:
-        abort(400)
-    else:
-        try:
-            block = websocket_client.getblock(request.json['hashorheight'])
-        except Exception as ex:
-            app.logger.warning('getblock exception: {}'.format(ex))
-            return jsonify({'code': 500})
-        return jsonify({'code': 0, 'data': block})
 
 @app.route('/gettransaction', methods=['POST'])
 def gettransaction():

@@ -325,6 +325,21 @@ class StegosClient:
             elapsed = time.monotonic() - start_time
             logging.info(f"{self.prefix} Elapsed: {elapsed}")
 
+    async def election_info(self):
+        if self.websocket is None:
+            return None
+        req = {
+            "type": "election_info",
+            "password": self.master_key,
+            "id": self.next_id(),
+        }
+        await self.send_msg(req)
+        while True:
+            resp = await self.recv_msg()
+            if resp['type'] == 'election_info':
+                return resp['epoch']
+            if resp['type'] == 'error' and resp['id'] == self.id:
+                return 0
 
 def encrypt(key, plaintext):
     assert len(key) == key_bytes
