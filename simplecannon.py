@@ -3,9 +3,9 @@
 import asyncio
 import json
 import stegos
+import setting
 
 from prometheus_client import start_http_server
-
 
 def load_nodes(path):
     f = open(path, "r")
@@ -13,12 +13,12 @@ def load_nodes(path):
     return json.loads(encoded)
 
 
-async def client_from_node(node):
-    client = stegos.StegosClient(node_id=node['node_id'],
-                                 uri=node['uri'],
-                                 accounts=node['accounts'],
-                                 master_key=node['key_password'],
-                                 api_key=node['api_token'])
+async def client_from_node():
+    client = stegos.StegosClient(node_id=setting.NODE_ID,
+                                 uri=setting.URI,
+                                 accounts=setting.ACCOUNTS,
+                                 master_key=setting.MASTER_KEY,
+                                 api_key=setting.API_KEY)
 
     await client.connect()
     return client
@@ -31,33 +31,20 @@ async def loop_payment(client, source, target, start_amount):
         amount = amount + 1
 
 
-async def my_app(nodes):
-    clients = []
-    for n in range(0, len(nodes)):
-        account_id = list(nodes[n]['accounts'].keys())[0]
-        dest_node = (n+1) % len(nodes)
-        dest_addr = nodes[dest_node]['accounts'][list(
-            nodes[dest_node]['accounts'].keys())[0]]
-        ws_client = await client_from_node(nodes[n])
-        gen_info = {
-            "source_id": account_id,
-            "dest_addr": dest_addr,
-            "ws_client": ws_client,
-        }
-        clients.append(gen_info)
+async def my_app():
+    client = await client_from_node()
 
-    for c in clients:
-        balance = await c['ws_client'].get_balance(c['source_id'])
-        assert balance > 0
+    print("Waiting for sync!")
+    await client.wait_sync()
 
-    for c in clients:
-        asyncio.ensure_future(loop_payment(
-            c['ws_client'], c['source_id'], c['dest_addr'], 10))
+    balance = await client.get_balance(setting.ACCOUNT_ID)
+    assert balance > 0
+
+    asyncio.ensure_future(loop_payment(client, setting.ACCOUNT_ID, setting.TO_ACCOUNT, setting.TO_AMOUNT))
 
 
 if __name__ == '__main__':
     start_http_server(8890)
-    nodes = load_nodes("sample.json")
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(my_app(nodes))
+    loop.run_until_complete(my_app())
     loop.run_forever()

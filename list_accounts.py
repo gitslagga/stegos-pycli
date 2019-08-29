@@ -23,13 +23,12 @@ async def client_from_node(node):
 
 async def my_app(nodes):
     full_nodes = []
-    for n in nodes:
-        client = await client_from_node(n)
-        ids = await client.list_accounts()
-        for id in ids.keys():
-            n['accounts'][id] = ids[id]
+    client = await client_from_node(nodes[0])
+    ids = await client.list_accounts()
+    for id in ids.keys():
+        nodes[0]['accounts'][id] = ids[id]
 
-        full_nodes.append(n)
+    full_nodes.append(nodes[0])
 
     out = open("out.json", "w")
     out.write(json.dumps(full_nodes, indent=2))

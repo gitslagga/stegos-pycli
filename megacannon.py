@@ -6,16 +6,15 @@ import logging
 import stegos
 import sys
 import websockets
+import setting
 
 from logging.handlers import RotatingFileHandler
 from prometheus_client import start_http_server
-
 
 def load_nodes(path):
     f = open(path, "r")
     encoded = f.read()
     return json.loads(encoded)
-
 
 async def client_from_node(node):
     client = stegos.StegosClient(node_id=node['node_id'],
@@ -48,28 +47,15 @@ async def loop_payment(client, source, target, start_amount):
 
 
 async def my_app(nodes):
-    clients = []
-    for n in range(0, len(nodes)):
-        accounts = list(nodes[n]['accounts'].keys())
-        accounts.sort()
-        for i in range(0, len(accounts)):
-            client = {
-                "socket": await client_from_node(nodes[n]),
-                "source": accounts[i],
-                "dest": nodes[n]['accounts'][accounts[(i+1) % len(accounts)]],
-            }
-            clients.append(client)
-            print(
-                f"clients lients[{i}]: source={client['source']}, dest={client['dest']}")
+    
+    client = await client_from_node(nodes[0])
 
-    for c in clients:
-        await c['socket'].wait_sync()
-        b = await c['socket'].get_balance(c['source'])
-        assert b > 0
+    my_account = list(nodes[0]['accounts'].keys())[0]
+    await client.wait_sync()
+    b = await client.get_balance(my_account)
+    assert b > 0
 
-    for c in clients:
-        asyncio.ensure_future(loop_payment(
-            c['socket'], c['source'], c['dest'], 0.01))
+    asyncio.ensure_future(loop_payment(client, my_account, setting.TO_ACCOUNT, setting.TO_AMOUNT))
 
 
 if __name__ == '__main__':
@@ -84,7 +70,8 @@ if __name__ == '__main__':
     logging.getLogger('').addHandler(handler)
     logging.getLogger('websockets').addHandler(logging.NullHandler())
     logging.getLogger('websockets').setLevel(logging.CRITICAL)
-    nodes = load_nodes("vst.json")
+
+    nodes = load_nodes("sample.json")
     loop = asyncio.get_event_loop()
     loop.run_until_complete(my_app(nodes))
     loop.run_forever()

@@ -3,49 +3,45 @@
 import asyncio
 import json
 import stegos
+import setting
 
 BOT_ACCOUNTS = 5
 
-
-def load_nodes(path):
-    f = open(path, "r")
-    encoded = f.read()
-    return json.loads(encoded)
-
-
-async def client_from_node(node):
-    client = stegos.StegosClient(node_id=node['node_id'],
-                                 uri=node['uri'],
-                                 master_key=node['key_password'],
-                                 api_key=node['api_token'])
+async def client_from_node():
+    client = stegos.StegosClient(node_id=setting.NODE_ID,
+                                 uri=setting.URI,
+                                 master_key=setting.MASTER_KEY,
+                                 api_key=setting.API_KEY)
 
     await client.connect()
     return client
 
+async def get_address():
+    node = await client_from_node()
+    print("Waiting for sync!")
+    await node.wait_sync()
 
-async def my_app(nodes):
-    for i in range(0, 7):
-        node = await client_from_node(nodes[i])
-        print("Waiting for sync!")
-        await node.wait_sync()
+    ids = await node.list_accounts()
+    for id in ids:
+        address = await node.get_address(id)
+        print(f"get_address: {id} = {address}")
 
-        ids = await node.list_accounts()
-        print(f"Node0{i+1} has accounts: {ids}")
-        if len(ids.keys()) < BOT_ACCOUNTS:
-            for n in range(0, BOT_ACCOUNTS - len(ids.keys())):
-                account_info = await node.create_account()
-                nodes[i]['accounts'][account_info['account_id']
-                                     ] = account_info['account_address']
-        else:
-            for id in ids:
-                address = await node.get_address(id)
-                nodes[i]['accounts'][id] = address
+async def create_account():
+    node = await client_from_node()
+    print("Waiting for sync!")
+    await node.wait_sync()
 
-    out = open("out.json", "w")
-    out.write(json.dumps(nodes, indent=2))
-
+    ids = await node.list_accounts()
+    print(f"Node0 has accounts: {ids}")
+    if len(ids.keys()) < BOT_ACCOUNTS:
+        for n in range(0, BOT_ACCOUNTS - len(ids.keys())):
+            account_info = await node.create_account()
+            print(f"create_account: {n} = {account_info}")
+    else:
+        for id in ids:
+            address = await node.get_address(id)
+            print(f"get_address: {id} = {address}")
 
 if __name__ == '__main__':
-    nodes = load_nodes("sample.json")
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(my_app(nodes))
+    loop.run_until_complete(get_address())

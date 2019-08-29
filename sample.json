@@ -1,4 +1,13 @@
-[
+[  
+  {
+    "uri": "ws://127.0.0.1:3145",
+    "accounts": {
+      "1": "7fcHygDCR8NFQ8WxYnmXnJHbko65VWAPNH5kFs3gk6gNa2pRYB2"
+    },
+    "key_password": "123456",
+    "api_token": "3cYdoIdwr3b49eyuH92oPw==",
+    "node_id": "alice"
+  },
   {
     "uri": "ws://127.0.0.1:3145",
     "accounts": {
@@ -6,6 +15,6 @@
     },
     "key_password": "123456",
     "api_token": "3cYdoIdwr3b49eyuH92oPw==",
-    "node_id": "dev-01"
+    "node_id": "bob"
   }
 ]

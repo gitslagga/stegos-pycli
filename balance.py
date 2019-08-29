@@ -2,16 +2,15 @@
 
 import asyncio
 import stegos
-
+import logging
+import setting
 
 async def my_app():
-    node01 = stegos.StegosClient(node_id='node01',
-                                 uri='ws://localhost:3145',
-                                 accounts={
-                                     '1': '7fCTXenNEh14D4y2ciiaQm4oGDbw7HcbzhUad8dHkrfLuFitR5D'
-                                 },
-                                 master_key='dev01',
-                                 api_key='3cYdoIdwr3b49eyuH92oPw==')
+    node01 = stegos.StegosClient(node_id=setting.NODE_ID,
+                                 uri=setting.URI,
+                                 accounts=setting.ACCOUNTS,
+                                 master_key=setting.MASTER_KEY,
+                                 api_key=setting.API_KEY)
 
     await node01.connect()
 
@@ -21,5 +20,7 @@ async def my_app():
     print(f"Node01 balance: {balance}")
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+
     loop = asyncio.get_event_loop()
     loop.run_until_complete(my_app())

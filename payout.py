@@ -4,50 +4,38 @@ import asyncio
 import json
 import stegos
 import logging
+import setting
 
-
-async def client_from_node(node):
-    client = stegos.StegosClient(node_id=node['node_id'],
-                                 uri=node['uri'],
-                                 accounts=node['accounts'],
-                                 master_key=node['master_key'],
-                                 api_key=node['api_key'])
+async def client_from_node():
+    client = stegos.StegosClient(node_id=setting.NODE_ID,
+                                 uri=setting.URI,
+                                 accounts=setting.ACCOUNTS,
+                                 master_key=setting.MASTER_KEY,
+                                 api_key=setting.API_KEY)
 
     await client.connect()
     return client
 
 
-async def my_app(heap_node, toAddress):
-    node01 = await client_from_node(heap_node)
+async def my_app():
+    client = await client_from_node()
 
-    my_account = list(heap_node['accounts'].keys())[0]
     print("Waiting for sync!")
-    await node01.wait_sync()
-    balance = await node01.get_balance(my_account)
+    await client.wait_sync()
+    balance = await client.get_balance(setting.ACCOUNT_ID)
 
-    print(f"Node01 balance before payments: {balance}")
-    print(f"send: {heap_node['accounts'][my_account]}")
-    print(f"receive: {toAddress}")
+    print(f"client balance before payments: {balance}")
+    print(f"send: {setting.ACCOUNT_ID}")
+    print(f"receive: {setting.TO_ACCOUNT}")
 
-    await node01.payment_with_confirmation(my_account, toAddress, 1_000, comment="Hi from Stegos")
+    await client.payment_with_confirmation(setting.ACCOUNT_ID, setting.TO_ACCOUNT, setting.TO_AMOUNT, comment="Hi from Stegos")
 
-    balance = await node01.get_balance('heap')
-    print(f"Node01 balance after payments: {balance}")
+    balance = await client.get_balance('heap')
+    print(f"client balance after payments: {balance}")
 
 if __name__ == '__main__':
-    heap = {
-        "node_id": "heap",
-        "accounts": {
-            "1": "7f9nY9R4LYwmTuc3oEVhDETx6pq5uMpxYzS7nX4F5jNVn6MTcF1"
-        },
-        "master_key": "123456",
-        "api_key": "3cYdoIdwr3b49eyuH92oPw==",
-        "uri": "ws://127.0.0.1:3145",
-    }
-    
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                        level=logging.INFO)
+
+    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(
-        my_app(heap, "7fd3kYCiBWSGg5bn7dC5EMWHLS8Ndsw8C2VFsHnzDcKmWmQ8jj6"))
+    loop.run_until_complete(my_app())
