@@ -13,3 +13,5 @@ RECOVERY        = 'toss egg artwork elephant proof gentle common toss brush prot
 
 TO_ACCOUNT      = '7fd3kYCiBWSGg5bn7dC5EMWHLS8Ndsw8C2VFsHnzDcKmWmQ8jj6'
 TO_AMOUNT       = 1
+
+DINGDING_URL    = 'https://oapi.dingtalk.com/robot/send?access_token=de1ff8be041703322fd78444ceccb6c0fbb6a2d17ffbb0dbbb4d9c8ad58e7116'
