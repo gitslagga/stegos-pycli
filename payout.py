@@ -30,7 +30,7 @@ async def my_app():
 
     await client.payment_with_confirmation(setting.ACCOUNT_ID, setting.TO_ACCOUNT, setting.TO_AMOUNT, comment="Hi from Stegos")
 
-    balance = await client.get_balance('heap')
+    balance = await client.get_balance(setting.ACCOUNT_ID)
     print(f"client balance after payments: {balance}")
 
 if __name__ == '__main__':
