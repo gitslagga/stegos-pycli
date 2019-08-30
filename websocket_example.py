@@ -63,20 +63,20 @@ async def hello():
         "account_id": '1',
         "id": 1,
     }
-    send_response = await websocket.send(str(base64.standard_b64encode(encrypt(api_key, json.dumps(req))), "utf-8"))
-    print('send response ', send_response)
+    response = await websocket.send(str(base64.standard_b64encode(encrypt(api_key, json.dumps(req))), "utf-8"))
+    print('send response ', response)
 
     while True:
-        resp = await websocket.recv()
-        resp = decrypt(api_key, base64.b64decode(resp))
-        resp = json.loads(resp)
+        response = await websocket.recv()
+        response = decrypt(api_key, base64.b64decode(response))
+        response = json.loads(response)
 
         # if resp['type'] == 'balance_changed' or resp['type'] == 'balance_info':
-            # print(f"balance_changed {resp}")
+            # print(f"balance_changed {response}")
 
         # if resp['type'] == 'sync_changed' and resp['is_synchronized']:
-            # print(f"sync_changed or is_synchronized {resp}")
+            # print(f"sync_changed or is_synchronized {response}")
 
-        print("receive response ", resp)
+        print("receive response ", response)
         time.sleep(5)
 asyncio.get_event_loop().run_until_complete(hello())
