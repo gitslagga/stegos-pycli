@@ -63,11 +63,13 @@ async def hello():
         "account_id": '1',
         "id": 1,
     }
-    response = await websocket.send(str(base64.standard_b64encode(encrypt(api_key, json.dumps(req))), "utf-8"))
-    print('send response ', response)
+    await websocket.send(str(base64.standard_b64encode(encrypt(api_key, json.dumps(req))), "utf-8"))
+    print('send request origin ', req)
+    print('send request encrypt ', str(base64.standard_b64encode(encrypt(api_key, json.dumps(req))), "utf-8"))
 
     while True:
         response = await websocket.recv()
+        print("receive response encrypt ", response)
         response = decrypt(api_key, base64.b64decode(response))
         response = json.loads(response)
 
@@ -77,6 +79,6 @@ async def hello():
         # if resp['type'] == 'sync_changed' and resp['is_synchronized']:
             # print(f"sync_changed or is_synchronized {response}")
 
-        print("receive response ", response)
+        print("receive response origin ", response)
         time.sleep(5)
 asyncio.get_event_loop().run_until_complete(hello())
