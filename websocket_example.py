@@ -68,11 +68,12 @@ async def hello():
             resp = decrypt(api_key, base64.b64decode(resp))
             resp = json.loads(resp)
 
-            if resp['type'] == 'balance_changed' or resp['type'] == 'balance_info':
-                print(f"balance_changed {resp}")
+            # if resp['type'] == 'balance_changed' or resp['type'] == 'balance_info':
+                # print(f"balance_changed {resp}")
 
-            if resp['type'] == 'sync_changed' and resp['is_synchronized']:
-                print(f"sync_changed or is_synchronized {resp}")
-                break
+            # if resp['type'] == 'sync_changed' and resp['is_synchronized']:
+                # print(f"sync_changed or is_synchronized {resp}")
 
+            print("response result ", resp)
+            time.sleep(5)
 asyncio.get_event_loop().run_until_complete(hello())
