@@ -56,24 +56,23 @@ def decrypt(key, ciphertext):
 
 
 async def hello():
-    async with websockets.connect('ws://localhost:3145') as websocket:
+    websocket = await websockets.connect('ws://localhost:3145', ping_timeout=None)
+    name = input("What's your name? ")
 
-        name = input("What's your name? ")
+    await websocket.send(str(base64.standard_b64encode(encrypt(api_key, json.dumps(name))), "utf-8"))
+    print(f"send {name}")
 
-        await websocket.send(str(base64.standard_b64encode(encrypt(api_key, json.dumps(name))), "utf-8"))
-        print(f"send {name}")
+    while True:
+        resp = await websocket.recv()
+        resp = decrypt(api_key, base64.b64decode(resp))
+        resp = json.loads(resp)
 
-        while True:
-            resp = await websocket.recv()
-            resp = decrypt(api_key, base64.b64decode(resp))
-            resp = json.loads(resp)
+        # if resp['type'] == 'balance_changed' or resp['type'] == 'balance_info':
+            # print(f"balance_changed {resp}")
 
-            # if resp['type'] == 'balance_changed' or resp['type'] == 'balance_info':
-                # print(f"balance_changed {resp}")
+        # if resp['type'] == 'sync_changed' and resp['is_synchronized']:
+            # print(f"sync_changed or is_synchronized {resp}")
 
-            # if resp['type'] == 'sync_changed' and resp['is_synchronized']:
-                # print(f"sync_changed or is_synchronized {resp}")
-
-            print("response result ", resp)
-            time.sleep(5)
+        print("response result ", resp)
+        time.sleep(5)
 asyncio.get_event_loop().run_until_complete(hello())
