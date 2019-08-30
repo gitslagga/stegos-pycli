@@ -57,10 +57,14 @@ def decrypt(key, ciphertext):
 
 async def hello():
     websocket = await websockets.connect('ws://localhost:3145', ping_timeout=None)
-    name = input("What's your name? ")
 
-    await websocket.send(str(base64.standard_b64encode(encrypt(api_key, json.dumps(name))), "utf-8"))
-    print(f"send {name}")
+    req = {
+        "type": "balance_info",
+        "account_id": '1',
+        "id": 1,
+    }
+    send_response = await websocket.send(str(base64.standard_b64encode(encrypt(api_key, json.dumps(req))), "utf-8"))
+    print('send response ', send_response)
 
     while True:
         resp = await websocket.recv()
@@ -73,6 +77,6 @@ async def hello():
         # if resp['type'] == 'sync_changed' and resp['is_synchronized']:
             # print(f"sync_changed or is_synchronized {resp}")
 
-        print("response result ", resp)
+        print("receive response ", resp)
         time.sleep(5)
 asyncio.get_event_loop().run_until_complete(hello())
