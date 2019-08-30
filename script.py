@@ -34,11 +34,6 @@ websocket_client = loop.run_until_complete(client_from_node())
 loop.run_until_complete(websocket_client.wait_sync())
 
 ###################################### rustful api ################################################
-@app.route('/getinfo', methods=['POST'])
-def getinfo():
-    wallet_info = loop.run_until_complete(websocket_client.get_balance("1"))
-    return jsonify({'code': 0, 'data': wallet_info})
-
 @app.route('/getblockcount', methods=['POST'])
 def getblockcount():
     block_count = loop.run_until_complete(websocket_client.election_info())
@@ -114,7 +109,7 @@ def sendDingDing(content):
         },
         'at': {
             'atMobiles': [],
-            'isAtAll': True
+            'isAtAll': False
         }
     }
 
