@@ -82,3 +82,17 @@ async def hello():
         print("receive response origin ", response)
         time.sleep(5)
 asyncio.get_event_loop().run_until_complete(hello())
+
+
+
+
+
+
+
+
+# send request origin  {'type': 'balance_info', 'account_id': '1', 'id': 1}
+# send request encrypt  QwVxuiPXH5YTUSRv1aJ+Y2ZpjwT1Q+QXcyP0q2oKrtEGrsabzcJPa+LXrLfKTHwzMV/0CNWC+Ho4yT6ec5D5STkp19s=
+# receive response encrypt  kdufVAXA0YH/rRt/eJ17znoBHaU9ahx7vq4CtbY5X0+zlqZgQ08032ACQ0Si3B8q9F1o9DMznxGu4AV8XJqPWlK57jlk7xvIbDmnlav+kqCLHLfk8DLpk07BPBh8aEIQU5XiCOrfRYzPQjWPsRUdyLmd7A==
+# receive response origin  {'account_id': '1', 'type': 'balance_info', 'balance': 1782764007, 'available_balance': 1782764007, 'id': 1}
+# receive response encrypt  Sr7ulOn//xciIdQuRf5nqpgu7x79CCFVU2JLYzaDcFMRgE1FW3Mun3oJEHCO+32X/HU0tM9IiYNkDk5em/CSZYVG87dnSXzbwyWp6NODXVag3o+/GaWP
+# receive response origin  {'type': 'rollback_micro_block', 'epoch': 14020, 'offset': 59, 'statuses': {}}
