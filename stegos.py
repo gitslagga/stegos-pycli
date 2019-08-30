@@ -196,7 +196,7 @@ class StegosClient:
             if 'id' in resp.keys() and resp['id'] == self.id and 'balance_info' == resp['type']:
                 return resp['balance']
 
-    async def payment_with_confirmation(self, source, address, amount, comment='', use_certificate=False):
+    async def payment_with_confirmation(self, source, address, amount, comment='', use_certificate=True):
         """
         Create regular payment and wait for TX to be included in microblock
         source: account_id to be used for payment
