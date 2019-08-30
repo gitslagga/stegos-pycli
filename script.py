@@ -1,7 +1,6 @@
 from flask import Flask, abort, request, jsonify
 from flask.json import JSONEncoder as BaseJSONEncoder
 from gevent.pywsgi import WSGIServer
-from logging.handlers import RotatingFileHandler
 
 import logging
 import json
@@ -65,37 +64,6 @@ def sendtoaddress():
             return jsonify({'code': 500})
         return jsonify({'code': 0, 'data': txdata})
 
-@app.route('/listtransactions', methods=['POST'])
-def listtransactions():
-    start = 0
-    num = 100
-
-    if request.json and 'start' in request.json:
-        start = request.json['start']
-    if request.json and 'num' in request.json:
-        num = request.json['num']
-
-    try:
-        list_transactions = websocket_client.listtransactions('*', num, start)
-    except Exception as ex:
-        app.logger.warning('listtransactions exception: {}'.format(ex))
-        return jsonify({'code': 500})
-    return jsonify({'code': 0, 'data': list_transactions})
-
-@app.route('/gettransaction', methods=['POST'])
-def gettransaction():
-    app.logger.warning('request params: {}'.format(request.json))
-
-    if not request.json or 'txid' not in request.json:
-        abort(400)
-    else:
-        try:
-            transaction = websocket_client.gettransaction(request.json['txid'])
-        except Exception as ex:
-            app.logger.warning('gettransaction exception: {}'.format(ex))
-            return jsonify({'code': 500})
-        return jsonify({'code': 0, 'data': transaction})
-
 ###################################### send ding ding ################################################
 def sendDingDing(content):
     headers = {
@@ -139,13 +107,11 @@ class JSONEncoder(BaseJSONEncoder):
 app.json_encoder = JSONEncoder
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
-    handler = RotatingFileHandler('flask.log', maxBytes=100*1024*1024, backupCount=5)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    handler.setFormatter(formatter)
-    logging.getLogger('').addHandler(handler)
-    logging.getLogger('websockets').addHandler(logging.NullHandler())
-    logging.getLogger('websockets').setLevel(logging.CRITICAL)
+    handler = logging.FileHandler('flask.log', encoding='UTF-8')
+    handler.setLevel(logging.WARNING)
+    logging_format = logging.Formatter('%(asctime)s - %(levelname)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')
+    handler.setFormatter(logging_format)
+    app.logger.addHandler(handler)
     # app.run(debug=True)
 
     ###################################### production run ################################################
