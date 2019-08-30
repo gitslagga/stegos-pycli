@@ -67,10 +67,12 @@ async def hello():
             resp = await websocket.recv()
             resp = decrypt(api_key, base64.b64decode(resp))
             resp = json.loads(resp)
-            if resp['type'] == 'balance_changed':
-                print(f"receive {resp}")
-                break
-            time.sleep(1)
 
+            if resp['type'] == 'balance_changed' or resp['type'] == 'balance_info':
+                print(f"receive {resp}")
+
+            if resp['type'] == 'sync_changed' and resp['is_synchronized']:
+                print("node is synchronized!")
+                break
 
 asyncio.get_event_loop().run_until_complete(hello())
