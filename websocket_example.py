@@ -15,6 +15,7 @@ from Crypto.Util import Counter
 from Crypto import Random
 
 key_bytes = 16
+api_key = base64.b64decode("3cYdoIdwr3b49eyuH92oPw==")
 
 
 def encrypt(key, plaintext):
@@ -56,15 +57,15 @@ def decrypt(key, ciphertext):
 
 async def hello():
     async with websockets.connect('ws://localhost:3145') as websocket:
+
         name = input("What's your name? ")
 
-        await websocket.send(name)
-
+        await websocket.send(str(base64.standard_b64encode(encrypt(api_key, json.dumps(name))), "utf-8"))
         print(f"send {name}")
 
         while True:
             resp = await websocket.recv()
-            resp = decrypt(base64.b64decode("3cYdoIdwr3b49eyuH92oPw=="), base64.b64decode(resp))
+            resp = decrypt(api_key, base64.b64decode(resp))
             resp = json.loads(resp)
             if resp['type'] == 'balance_changed':
                 print(f"receive {resp}")
