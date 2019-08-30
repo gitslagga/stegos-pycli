@@ -69,10 +69,10 @@ async def hello():
             resp = json.loads(resp)
 
             if resp['type'] == 'balance_changed' or resp['type'] == 'balance_info':
-                print(f"receive {resp}")
+                print(f"balance_changed {resp}")
 
             if resp['type'] == 'sync_changed' and resp['is_synchronized']:
-                print("node is synchronized!")
+                print(f"sync_changed or is_synchronized {resp}")
                 break
 
 asyncio.get_event_loop().run_until_complete(hello())
