@@ -59,15 +59,15 @@ req = {
     "type": "balance_info",
     "account_id": '1',
     "id": 1,
-} 
-print('send request origin ', req)
+}
 
 encode = str(base64.standard_b64encode(encrypt(api_key, json.dumps(req))), "utf-8")
-print('send request encrypt ', encode)
+print('encrypt ', encode)
 
 rsp = "QwVxuiPXH5YTUSRv1aJ+Y2ZpjwT1Q+QXcyP0q2oKrtEGrsabzcJPa+LXrLfKTHwzMV/0CNWC+Ho4yT6ec5D5STkp19s="
 decode = decrypt(api_key, base64.b64decode(rsp))
-print("receive response origin ", rsp)
-print("receive response decrypt ", decode)
-print("receive response json loads ", json.loads(decode))
+print('decrypt ', json.loads(decode))
 
+
+# encrypt  QwVxuiPXH5YTUSRv1aJ+Y2ZpjwT1Q+QXcyP0q2oKrtEGrsabzcJPa+LXrLfKTHwzMV/0CNWC+Ho4yT6ec5D5STkp19s=
+# decrypt  {'type': 'balance_info', 'account_id': '1', 'id': 1}
