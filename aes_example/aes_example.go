@@ -10,7 +10,7 @@ import (
 	"io"
 )
 
-func encrypt_origin() {
+func decrypt_origin() {
 	encKey := "3cYdoIdwr3b49eyuH92oPw=="
 	cipherText := "+Ywz8IlmUhVrfklYNJFuom+dLZ2kpEWgTgvyvf5/JVGC2mPY2uYPSpxQk7bCrjInQ5yV3XQfjMUf35aMNJqt"
 
